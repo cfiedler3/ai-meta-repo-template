@@ -134,5 +134,6 @@ A module is enabled when its status reads `enabled`; the agent reads the referen
 
 - `docs/standard-naming-project.md` — project identity and naming
 - `docs/standard-naming-github.md` — GitHub-specific repository rules
+- `docs/standard-project-instructions.md` — assistant project settings bootstrap
 
 In repositories other than the template, these are links to `ai-meta-repo-template`, not local files.

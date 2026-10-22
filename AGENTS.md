@@ -103,7 +103,7 @@ Approval is per action and per session. It does not carry over.
 |---|---|---|
 | Efficiency routing | enabled | `<projects-root>/ai-code-efficiency/AGENTS.md` |
 
-A module is enabled when its status reads `enabled`; the agent reads the reference before starting work. Set `disabled` to turn it off. `<projects-root>` is the machine's projects folder; the reference is a sibling clone, not a copy inside this repository. References become URLs when the module repository is public.
+A module is enabled when its status reads `enabled`; the agent reads the reference before starting work. Set `disabled` to turn it off. `<projects-root>` is the machine's projects folder; the reference is a sibling clone, not a copy inside this repository. In a hosted session with no local projects folder, the agent attaches the module's repository (`<owner>/<module-repo>`) and clones it as a sibling of this repository before reading the reference. Project settings must instruct the session to do so; see `docs/standard-project-instructions.md`.
 
 ---
 
@@ -134,5 +134,6 @@ A module is enabled when its status reads `enabled`; the agent reads the referen
 
 - `docs/standard-naming-project.md` — project identity and naming
 - `docs/standard-naming-github.md` — GitHub-specific repository rules
+- `docs/standard-project-instructions.md` — assistant project settings bootstrap
 
 In repositories other than the template, these are links to `ai-meta-repo-template`, not local files.

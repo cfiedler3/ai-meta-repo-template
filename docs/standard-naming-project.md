@@ -29,7 +29,7 @@ Renaming a project means renaming all three. Adding or removing a repository cha
 ## 3. Project ID Format
 
 ```
-[backing]-[domain]-[project]-[descriptor]
+[backing]-[domain]-[project]-[descriptor]-[visibility]
 ```
 
 | Segment | Required | Meaning |
@@ -38,6 +38,7 @@ Renaming a project means renaming all three. Adding or removing a repository cha
 | `domain` | Recommended | Area of life or work (Section 5) |
 | `project` | Yes | The initiative name (Section 6) |
 | `descriptor` | No | Component or scope qualifier (Section 7) |
+| `visibility` | No | `private` only: the project is intended to remain private. Always the final segment. Platform rules define what it means for a repository (see `standard-naming-github.md`, Section 4) |
 
 **Core rules**
 
@@ -45,11 +46,13 @@ Renaming a project means renaming all three. Adding or removing a repository cha
 - Hyphens (`-`) separate words; no spaces, underscores, or special characters
 - Concise, descriptive, readable at a glance
 - No version numbers (use tags, releases, or branches)
+- A visibility suffix is part of the Project ID and appears on every artifact, not only the repository
 
 **Examples**
 
 - `ai-biz-example-shop`
 - `ai-am-printer-model-slicer-profiles`
+- `ai-home-example-private`
 - `hm-home-finance`
 - `hm-trip-example-2026`
 
@@ -120,7 +123,7 @@ Add a suffix when a project has separately managed components.
 | `-scripts` | Automation / scripts |
 | `-infra` | Infrastructure / configuration |
 
-Component projects carry the same backing and domain prefixes as their parent.
+Component projects carry the same backing and domain prefixes as their parent. A visibility suffix, if used, follows the descriptor (`ai-example-api-private`).
 
 Sub-project nesting rules (for example, `home-maint` and `home-maint-porch`) are deferred.
 
@@ -151,6 +154,7 @@ Archived projects and backup archives (`.zip`) are exempt from this standard.
 - [ ] `ai-` only if a repository exists and is in the connector; `hm-` only if no repository exists
 - [ ] Domain from the Section 5 table, or omitted
 - [ ] Lowercase, hyphen-separated, no version numbers
+- [ ] Visibility suffix, if used, is `-private`, is last, and appears on every artifact
 - [ ] Assistant project, repository, and local folder all carry the ID exactly
 - [ ] Platform-specific checks completed (see the platform standard)
 
@@ -161,6 +165,8 @@ Archived projects and backup archives (`.zip`) are exempt from this standard.
 - `biz-example-shop` (missing backing prefix)
 - `ai-hm-example` (two backing prefixes)
 - Repository `ai-personal-example` with assistant project `ai-example` (misaligned)
+- Repository `ai-example-private` with assistant project `ai-example` (visibility suffix dropped from one artifact)
+- `ai-private-example` or `ai-example-private-api` (visibility suffix not last)
 - `ai-example` folder with no repository (wrong backing prefix)
 - A copy of this document in another repository
 
@@ -170,5 +176,6 @@ Archived projects and backup archives (`.zip`) are exempt from this standard.
 
 | Date | Change |
 |---|---|
+| 2026-11-07 | Added optional `visibility` segment (`-private`) to the Project ID format; it is part of the ID on every artifact. Updated checklist and anti-patterns |
 | 2026-10-01 | Added `meta-` domain; template is `ai-meta-repo-template` (public) and no longer exempt |
 | 2026-10-01 | Initial version. Extracted vendor-neutral content from `github-naming-standard.md` (now `standard-naming-github.md`); introduced Project ID, backing prefix (`ai-`/`hm-`), `home-` and `trip-` domains, tooling matrix, retirement rules |

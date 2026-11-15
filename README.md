@@ -19,6 +19,7 @@ or click **Use this template** on GitHub. Name the repository with its Project I
 5. Add the repository to every assistant GitHub integration in use (chat connector and coding-agent app have separate access lists).
 6. Add a `protect-main` ruleset: require pull request, block force pushes, squash merge only.
 7. Create the assistant project's instructions from `docs/standard-project-instructions.md`.
+8. If the Project ID ends in `-private`, complete the required actions in `docs/standard-naming-github.md` Section 4 before committing any project content. Otherwise, delete `AGENTS.md` Section 12.
 
 ## Contents
 

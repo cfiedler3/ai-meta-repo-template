@@ -47,6 +47,7 @@ Renaming a project means renaming all three. Adding or removing a repository cha
 - Concise, descriptive, readable at a glance
 - No version numbers (use tags, releases, or branches)
 - A visibility suffix is part of the Project ID and appears on every artifact, not only the repository
+- A visibility suffix carries required actions, not only a name. For a repository they are listed in `standard-naming-github.md`, Section 4
 
 **Examples**
 
@@ -176,6 +177,7 @@ Archived projects and backup archives (`.zip`) are exempt from this standard.
 
 | Date | Change |
 |---|---|
+| 2026-11-14 | Section 3: a visibility suffix carries required actions, defined in the platform standard |
 | 2026-11-07 | Added optional `visibility` segment (`-private`) to the Project ID format; it is part of the ID on every artifact. Updated checklist and anti-patterns |
 | 2026-10-01 | Added `meta-` domain; template is `ai-meta-repo-template` (public) and no longer exempt |
 | 2026-10-01 | Initial version. Extracted vendor-neutral content from `github-naming-standard.md` (now `standard-naming-github.md`); introduced Project ID, backing prefix (`ai-`/`hm-`), `home-` and `trip-` domains, tooling matrix, retirement rules |

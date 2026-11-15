@@ -61,6 +61,7 @@ Approval is per action and per session. It does not carry over.
 - Merging pull requests
 - Deleting branches, files, or history
 - Creating, rotating, or storing credentials; committing secrets
+- Committing sensitive content from a `-private` project, or quoting it in commit messages, pull request bodies, or issues (Section 12)
 - Modifying repository, governance, or security settings
 - Any irreversible action without human approval
 
@@ -137,3 +138,19 @@ A module is enabled when its status reads `enabled`; the agent reads the referen
 - `docs/standard-project-instructions.md` — assistant project settings bootstrap
 
 In repositories other than the template, these are links to `ai-meta-repo-template`, not local files.
+
+---
+
+## 12. Data Handling
+
+**[project]** Required when the Project ID ends in `-private`; delete the section otherwise. The required actions are in `docs/standard-naming-github.md`, Section 4.
+
+- **Sensitive content:** `<what counts as sensitive in this project>`
+- **Location:** `data/` — untracked and listed in `.gitignore`
+- **Tracked content:** `<what may be committed, for example instructions, procedures, and structure without values>`
+
+Rules:
+
+- Sensitive content is never committed, and never quoted in commit messages, pull request bodies, or issues.
+- Private content is not copied or linked into any public repository.
+- `data/` is added to `.gitignore` before the first commit that adds project content.

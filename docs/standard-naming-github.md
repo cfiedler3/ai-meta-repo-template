@@ -40,9 +40,24 @@ Use the suffix `-private` for a repository intended to remain private. Place it 
 The suffix communicates intent only. GitHub's visibility setting controls access; verify it directly rather than inferring it from the name.
 See [GitHub repository visibility](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories).
 
+### Required actions
+
+When a Project ID ends in `-private`, complete every action below. Actions 1 to 5 are completed before the first commit that adds project content.
+
+1. Carry the suffix on the assistant project, the repository, and the local folder (project standard, Section 3).
+2. Create the repository with private visibility, then confirm the setting in the repository's settings.
+3. Set the Visibility line in `AGENTS.md` Section 1 to `private`.
+4. Keep sensitive records in an untracked `data/` folder, and add `data/` to the repository's `.gitignore`. The template's `.gitignore` does not include it; it is added per private repository.
+5. Complete `AGENTS.md` Section 12 (Data Handling): state what is sensitive, where it lives, and what may be tracked.
+6. Never commit sensitive content, and never quote it in commit messages, pull request bodies, or issues. This binds people and agents alike.
+7. Do not copy or link private content into any public repository.
+8. Treat removal of the suffix as a rename of all three artifacts that also requires publication approval (see the rules below).
+
+### Rules
+
 - An unmarked repository is neither automatically public nor approved for publication.
 - Publishing a repository or changing it to public requires separate explicit approval and review of the files and Git history intended for publication. Removing `-private` does not grant approval or change access settings.
-- Keep private lesson records and supporting evidence outside tracked repository content, even when the repository is private.
+- Keep sensitive records and supporting evidence outside tracked repository content, even when the repository is private.
 - Maintain explicit project inclusion and exclusion lists for discovery. `ai-*` finds all project repositories and `ai-*-private` finds names marked private; neither filter establishes actual visibility or permission to inspect content.
 - Existing repositories need not be renamed solely to adopt this marker. Any separately authorized rename must preserve alignment with the assistant project and local folder.
 
@@ -122,6 +137,7 @@ Before creating a repo, confirm:
 - [ ] `protect-main` ruleset applied
 - [ ] Cloned to `<projects-root>` under the same name
 - [ ] If used, `-private` is the final suffix
+- [ ] If `-private`: Section 4 required actions completed (visibility confirmed in settings, `data/` ignored, `AGENTS.md` Section 12 completed)
 - [ ] Discovery inclusion and exclusion recorded separately when planning a review
 
 ---
@@ -137,6 +153,7 @@ Before creating a repo, confirm:
 
 | Date | Change |
 |---|---|
+| 2026-11-14 | Section 4: added numbered required actions for `-private` projects; generalized "lesson records" to "sensitive records"; added checklist item |
 | 2026-10-01 | Template is `ai-meta-repo-template`; `meta-` repositories public by default; `protect-main` ruleset required |
 | 2026-10-01 | Renamed from `github-naming-standard.md`. Trimmed to GitHub-specific content; identity, prefixes, and alignment moved to `standard-naming-project.md`. Added connector and retirement sections |
 | 2026-09-30 | Added governance prefix (`ai-` / `hm-`), rules and exemptions, `am-` domain, assistant project alignment |

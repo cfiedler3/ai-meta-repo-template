@@ -24,7 +24,18 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install --quiet "copier==9.19.1"
       - name: Acceptance tests
-        run: python -m unittest discover -s tests -v
+        shell: bash
+        env:
+          PYTHONUTF8: "1"
+        run: |
+          set -o pipefail
+          python -m unittest discover -s tests -v 2>&1 | tee test-output.txt
+      - name: Annotate test failures
+        if: failure()
+        shell: bash
+        run: |
+          # Surface failures as annotations, which are readable without opening the log.
+          grep -E -A12 '^(FAIL|ERROR):' test-output.txt | grep -v '^--$' | head -60 | sed 's/^/::error::/' || true
 
   pr-meta:
     # Branch name and pull request title rules for this repository, using the generated validator.

@@ -35,12 +35,19 @@ FIXTURE_NAMES = sorted(p.stem for p in FIXTURES.glob("*.yml"))
 
 
 def run(cmd, cwd=None, check=True):
-    env = dict(os.environ, **GIT_ENV)
+    env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8", **GIT_ENV)
     env.pop("GITHUB_REPOSITORY", None)  # folder name, not CI repo name, is checked in tests
-    result = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True)
+    result = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True,
+                            encoding="utf-8", errors="replace")
     if check and result.returncode != 0:
         raise AssertionError("command failed: %s\n%s\n%s" % (cmd, result.stdout, result.stderr))
     return result
+
+
+def write(path, text, encoding="utf-8"):
+    """Write text with LF line endings on every platform (Path.write_text translates on Windows)."""
+    with open(str(path), "w", encoding=encoding, newline="\n") as handle:
+        handle.write(text)
 
 
 def git(cwd, *args, check=True):
@@ -156,7 +163,7 @@ class TestGeneration(TemplateTestCase):
                 if os.environ.get("UPDATE_GOLDEN"):
                     target.mkdir(parents=True, exist_ok=True)
                     for name, content in snapshot.items():
-                        (target / name).write_text(content, encoding="utf-8", newline="\n")
+                        write((target / name), content)
                 for name, content in snapshot.items():
                     expected = (target / name).read_text(encoding="utf-8").replace("\r\n", "\n")
                     self.assertEqual(content.replace("\r\n", "\n"), expected, "%s/%s changed" % (fixture, name))
@@ -247,24 +254,24 @@ class TestValidator(TemplateTestCase):
     def test_seeded_defects_are_reported(self):
         def mutate_answers(d):
             p = d / ".copier-answers.yml"
-            p.write_text(p.read_text(encoding="utf-8") + "favourite_colour: blue\n", encoding="utf-8")
+            write(p, p.read_text(encoding="utf-8") + "favourite_colour: blue\n")
 
         defects = {
-            "placeholder": (lambda d: (d / "README.md").write_text("# <project-id>\n", encoding="utf-8"), "placeholder"),
-            "jinja": (lambda d: (d / "docs/notes.md").write_text("Value: {{ x }}\n", encoding="utf-8"), "placeholder"),
-            "conflict": (lambda d: (d / "README.md").write_text("<<<<<<< before\nx\n=======\ny\n>>>>>>> after\n", encoding="utf-8"), "conflict marker"),
-            "rej": (lambda d: (d / "AGENTS.md.rej").write_text("x\n", encoding="utf-8"), "leftover"),
+            "placeholder": (lambda d: write((d / "README.md"), "# <project-id>\n", encoding="utf-8"), "placeholder"),
+            "jinja": (lambda d: write((d / "docs/notes.md"), "Value: {{ x }}\n", encoding="utf-8"), "placeholder"),
+            "conflict": (lambda d: write((d / "README.md"), "<<<<<<< before\nx\n=======\ny\n>>>>>>> after\n", encoding="utf-8"), "conflict marker"),
+            "rej": (lambda d: write((d / "AGENTS.md.rej"), "x\n", encoding="utf-8"), "leftover"),
             "missing": (lambda d: (d / "LICENSE").unlink(), "required file missing"),
-            "link": (lambda d: (d / "docs/notes.md").write_text("[x](missing.md)\n", encoding="utf-8"), "broken link"),
-            "claude": (lambda d: (d / "CLAUDE.md").write_text("@AGENTS.md\nExtra rule.\n", encoding="utf-8"), "CLAUDE.md"),
+            "link": (lambda d: write((d / "docs/notes.md"), "[x](missing.md)\n", encoding="utf-8"), "broken link"),
+            "claude": (lambda d: write((d / "CLAUDE.md"), "@AGENTS.md\nExtra rule.\n", encoding="utf-8"), "CLAUDE.md"),
             "answers": (mutate_answers, "unknown keys"),
             "foreign-doc": (lambda d: (d / "docs/governance").mkdir(exist_ok=True) or
-                            (d / "docs/governance/agentic-operations.md").write_text("x\n", encoding="utf-8"),
+                            write((d / "docs/governance/agentic-operations.md"), "x\n", encoding="utf-8"),
                             "another profile"),
-            "section-removed": (lambda d: (d / "AGENTS.md").write_text(
+            "section-removed": (lambda d: write((d / "AGENTS.md"), 
                 re.sub(r"(?s)## Prohibited.*?(?=\n## )", "", (d / "AGENTS.md").read_text(encoding="utf-8")),
                 encoding="utf-8"), "missing cmn-prohibited"),
-            "duplicate": (lambda d: (d / "AGENTS.md").write_text(
+            "duplicate": (lambda d: write((d / "AGENTS.md"), 
                 (d / "AGENTS.md").read_text(encoding="utf-8") + "\n- Prefer editing an existing file to creating a parallel one.\n",
                 encoding="utf-8"), "repeats line"),
         }
@@ -280,7 +287,7 @@ class TestValidator(TemplateTestCase):
     def test_private_without_data_ignore_fails(self):
         dest = self.copy("ai-home-example-assisted-private")
         gi = dest / ".gitignore"
-        gi.write_text(gi.read_text(encoding="utf-8").replace("data/\n", ""), encoding="utf-8")
+        write(gi, gi.read_text(encoding="utf-8").replace("data/\n", ""))
         code, out = self.validate(dest)
         self.assertEqual(code, 1)
         self.assertIn("data/", out)
@@ -297,10 +304,10 @@ class TestValidator(TemplateTestCase):
         fresh = self.copy("ai-biz-example-agentic")
         self.assertEqual(self.validate(dest, "--compare-to", str(fresh))[0], 0)
         agents = dest / "AGENTS.md"
-        agents.write_text(agents.read_text(encoding="utf-8").replace("first push of each branch", "first merge"),
+        write(agents, agents.read_text(encoding="utf-8").replace("first push of each branch", "first merge"),
                           encoding="utf-8")
         project_edit = agents.read_text(encoding="utf-8") + "- Use tabs.\n"
-        agents.write_text(project_edit, encoding="utf-8")
+        write(agents, project_edit)
         code, out = self.validate(dest, "--compare-to", str(fresh))
         self.assertEqual(code, 1)
         self.assertIn("agt-autonomy", out)
@@ -312,7 +319,7 @@ class TestValidator(TemplateTestCase):
         dest = self.copy("ai-biz-example-multi-agent")
         self.init_repo(dest)
         agents = dest / "AGENTS.md"
-        agents.write_text(agents.read_text(encoding="utf-8") + "- Project rule.\n", encoding="utf-8")
+        write(agents, agents.read_text(encoding="utf-8") + "- Project rule.\n")
         commit_all(dest, "docs: project rule")
         work = self.tmp / "recopy" / dest.name
         shutil.copytree(dest, work)
@@ -330,14 +337,14 @@ class TestLifecycle(TemplateTestCase):
         dest = self.copy("ai-biz-example-agentic")
         self.init_repo(dest)
         agents = dest / "AGENTS.md"
-        agents.write_text(agents.read_text(encoding="utf-8").replace(
+        write(agents, agents.read_text(encoding="utf-8").replace(
             "<!-- Record language, formatting, test, and build conventions specific to this project here. -->",
-            "- Python 3.12, formatted with the standard library only."), encoding="utf-8")
-        (dest / "README.md").write_text("# Example\n\nProject-owned readme.\n", encoding="utf-8")
-        (dest / "docs/decisions/0001-use-sqlite.md").write_text("# 0001. Use SQLite\n", encoding="utf-8")
+            "- Python 3.12, formatted with the standard library only."))
+        write((dest / "README.md"), "# Example\n\nProject-owned readme.\n")
+        write((dest / "docs/decisions/0001-use-sqlite.md"), "# 0001. Use SQLite\n")
         (dest / "docs/agent").mkdir(parents=True)
-        (dest / "docs/agent/state.md").write_text("# Agent state\n\n- 2026-11-01: history entry\n", encoding="utf-8")
-        (dest / "src.py").write_text("print('hello')\n", encoding="utf-8")
+        write((dest / "docs/agent/state.md"), "# Agent state\n\n- 2026-11-01: history entry\n")
+        write((dest / "src.py"), "print('hello')\n")
         commit_all(dest, "feat: project content")
         before = {p: (dest / p).read_bytes() for p in
                   ("README.md", "docs/decisions/0001-use-sqlite.md", "docs/agent/state.md", "src.py")}
@@ -345,11 +352,11 @@ class TestLifecycle(TemplateTestCase):
 
         def edit(tpl):
             p = tpl / "includes/governance/common/practices.md.jinja"
-            p.write_text(p.read_text(encoding="utf-8") + "- Keep pull requests reviewable in one sitting.\n", encoding="utf-8")
+            write(p, p.read_text(encoding="utf-8") + "- Keep pull requests reviewable in one sitting.\n")
             r = tpl / "includes/governance/common/references.md.jinja"
-            r.write_text(r.read_text(encoding="utf-8") + "- Template changelog: `docs/decisions/` in the template\n", encoding="utf-8")
+            write(r, r.read_text(encoding="utf-8") + "- Template changelog: `docs/decisions/` in the template\n")
             readme = tpl / "template/README.md.jinja"
-            readme.write_text(readme.read_text(encoding="utf-8") + "\nChanged seed.\n", encoding="utf-8")
+            write(readme, readme.read_text(encoding="utf-8") + "\nChanged seed.\n")
         self.new_template_version("v9.10.0", edit)
 
         self.update(dest, "--vcs-ref", "v9.10.0")
@@ -369,7 +376,7 @@ class TestLifecycle(TemplateTestCase):
         """assisted -> agentic -> multi-agent -> agentic -> assisted keeps project records."""
         dest = self.copy("ai-biz-example-assisted")
         self.init_repo(dest)
-        (dest / "docs/decisions/0001-record.md").write_text("# 0001. Record\n", encoding="utf-8")
+        write((dest / "docs/decisions/0001-record.md"), "# 0001. Record\n")
         commit_all(dest, "docs: add decision")
         expected_files = {
             "assisted": (set(), {"docs/governance/agentic-operations.md", "docs/governance/multi-agent-operations.md"}),
@@ -391,7 +398,7 @@ class TestLifecycle(TemplateTestCase):
                 self.assertIn(TAG, (dest / ".copier-answers.yml").read_text(encoding="utf-8"))
                 if profile == "agentic" and step == 0:
                     (dest / "docs/agent").mkdir(parents=True)
-                    (dest / "docs/agent/state.md").write_text("# Agent state\n\n- 2026-11-27: first delegation\n",
+                    write((dest / "docs/agent/state.md"), "# Agent state\n\n- 2026-11-27: first delegation\n",
                                                               encoding="utf-8")
                 self.assert_valid(dest)
                 commit_all(dest, "chore(profile): switch to " + profile)

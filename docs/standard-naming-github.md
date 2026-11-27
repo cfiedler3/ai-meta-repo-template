@@ -75,7 +75,7 @@ When a Project ID ends in `-private`, complete every action below. Actions 1 to 
 
 | Action | When |
 |---|---|
-| Archive | The repository represents real past work or may be referenced again. Archived repositories remain read-only on GitHub, are removed from the connector, have their local clone deleted, and are exempt from naming rules |
+| Archive | The repository represents real past work or may be referenced again. Archived repositories remain read-only on GitHub, are removed from the connector, have their local clone deleted after local-only content is preserved (project standard, Section 8), and are exempt from naming rules |
 | Delete | Throwaway or test repositories with no history worth keeping |
 
 Archive is the default; delete only when certain.
@@ -153,6 +153,7 @@ Defined in each repository's `AGENTS.md` (Source control section) and enforced b
 
 | Date | Change |
 |---|---|
+| 2026-11-27 | Section 6: delete a local clone only after local-only content is preserved (project standard, Section 8) |
 | 2026-11-27 | Section 3: Copier provisioning, required `governance` check, GitHub Free ruleset limit. Section 4: required actions use Copier answers. Section 9: replaced stale future extensions with a pointer to `AGENTS.md` |
 | 2026-11-14 | Section 4: added numbered required actions for `-private` projects; generalized "lesson records" to "sensitive records"; added checklist item |
 | 2026-10-01 | Template is `ai-meta-repo-template`; `meta-` repositories public by default; `protect-main` ruleset required |

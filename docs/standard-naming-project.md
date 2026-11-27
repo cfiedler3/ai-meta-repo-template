@@ -71,7 +71,7 @@ The first segment states where the project's source of truth lives. It is observ
 **Rules**
 
 1. A repository is always `ai-`. Every repository is created from `ai-meta-repo-template` and carries `AGENTS.md` (imported by the assistant's instruction file).
-2. `hm-` is for projects whose content does not warrant version control. If a project's loss would matter, it is `ai-`.
+2. `hm-` is for projects whose content does not warrant version control. Version control and backup are separate needs: a project is `ai-` when it needs version history or agent commits, and any project whose loss would matter needs a backup, whatever its prefix. Content kept out of the repository on purpose, such as a `-private` project's `data/` folder (`standard-naming-github.md`, Section 4), is not protected by version control.
 3. Promotion (`hm-` → `ai-`): initialize the repository, push, register it with the assistant's repository connector, rename all artifacts. Demotion is the reverse.
 4. The assistant's repository connector grants access to all active `ai-` repositories and nothing else. Any mismatch is drift and is corrected.
 
@@ -134,8 +134,15 @@ Sub-project nesting rules (for example, `home-maint` and `home-maint-porch`) are
 
 | Project type | Retirement action |
 |---|---|
-| `ai-` | Archive the repository on the hosting platform; remove it from the connector; delete the local clone |
+| `ai-` | Preserve local-only content (below); archive the repository on the hosting platform; remove it from the connector; delete the local clone |
 | `hm-` | Move the folder to `<projects-root>/Archive/` |
+
+**Preserve local-only content before deleting a clone.** A clone can hold content the repository does not, including a `-private` project's untracked `data/` folder.
+
+1. List local-only content: `git status --short --ignored` (untracked and ignored files), `git log --branches --not --remotes --oneline` (unpushed commits), and `git stash list`.
+2. Push or deliberately discard each unpushed commit and stash.
+3. Copy every untracked or ignored file still needed to `<projects-root>/Archive/<Project ID>-local.zip`, then open the archive and confirm it lists those files.
+4. Delete the clone only after step 3 is confirmed.
 
 Archived projects and backup archives (`.zip`) are exempt from this standard.
 
@@ -179,6 +186,7 @@ Archived projects and backup archives (`.zip`) are exempt from this standard.
 
 | Date | Change |
 |---|---|
+| 2026-11-27 | Section 4: version control and backup are separate needs. Section 8: preserve local-only content before deleting a clone |
 | 2026-11-27 | Section 9: pinned links; template-rendered files are not copies (ADR 0003) |
 | 2026-11-14 | Section 3: a visibility suffix carries required actions, defined in the platform standard |
 | 2026-11-07 | Added optional `visibility` segment (`-private`) to the Project ID format; it is part of the ID on every artifact. Updated checklist and anti-patterns |

@@ -1,0 +1,81 @@
+# Agentic operations
+
+Template-owned procedures for the {{ profile }} profile. Rules are in `AGENTS.md`; this file holds formats and step-by-step procedures. Do not edit it here; change it in the template.
+
+## 1. State file
+
+`docs/agent/state.md` is project-owned. The template never creates, changes, or deletes it, so it survives template updates and profile changes. Create it from the skeleton below before the first delegation.
+
+```markdown
+# Agent state
+
+## Active delegation
+
+- Granted: YYYY-MM-DD by the owner, in chat
+- Objective: one sentence
+- Scope: paths and actions allowed
+- Acceptance criteria: numbered, each verifiable by a command or check
+- Extra gates: none, or a list
+{%- if profile == 'multi-agent' %}
+- Budget: token or cost ceiling, or none
+{%- endif %}
+
+## Plan
+
+1. Step
+
+## Progress
+
+- YYYY-MM-DD: what was done, on which branch, verified how
+
+## Decisions
+
+- YYYY-MM-DD: decision and reason (record lasting ones in docs/decisions/)
+
+## Open questions
+
+- none
+
+## Next step
+
+One concrete action.
+{%- if profile == 'multi-agent' %}
+
+## Delegation log
+
+| id | role | model | scope | status | verifier | result |
+|---|---|---|---|---|---|---|
+{%- endif %}
+```
+
+Rules:
+
+- When a delegation ends, move it under a dated `## History` heading; never delete history.
+- Record a profile change here, with its reason, before running it.
+- Keep secrets, credentials, and sensitive data out of this file.
+
+## 2. Session start
+
+1. Read `AGENTS.md` and `docs/agent/state.md`.
+2. Run `git status`, `git log --oneline -10`, and check open pull requests.
+3. Confirm the branch, working tree, and last commit match the state file. Report any difference before continuing.
+4. Confirm a delegation is active and the next step is inside its scope.
+
+## 3. Approval gates
+
+At each gate, update the state file, then ask the owner with: the action, why it is needed, what it changes, and how to undo it. Proceed only on an explicit yes in the current session.
+
+## 4. Session end
+
+1. Commit or stash work in progress on the delegation's branch.
+2. Update Progress, Open questions, and Next step.
+3. Report to the owner: done, verified, blocked, and next.
+
+## 5. Recovery
+
+| Situation | Action |
+|---|---|
+| Working tree differs from the state file | Report the difference; ask before changing anything |
+| Check fails after three attempts | Stop and escalate with the failing command and output |
+| Wrong approach committed locally | Add a corrective commit or start a new branch; never rewrite pushed history |
+| Branch is no longer wanted | Ask the owner; delete only branches you created |

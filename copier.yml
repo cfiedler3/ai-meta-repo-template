@@ -1,0 +1,158 @@
+# Copier configuration for ai-meta-repo-template.
+# Questions, validators, and settings. Generated repository content lives in template/.
+# Governance modules live in includes/governance/ and are never copied as files.
+# See docs/procedure-provisioning.md and docs/decisions/.
+
+_min_copier_version: "9.13.0"
+_subdirectory: template
+_templates_suffix: .jinja
+_answers_file: .copier-answers.yml
+_envops:
+  undefined: jinja2.StrictUndefined
+  keep_trailing_newline: true
+
+# Project-owned files: created once, never overwritten by copier update.
+_skip_if_exists:
+  - README.md
+  - docs/decisions/README.md
+  - docs/agent/state.md
+
+# v1 runs no code: no _tasks, no _migrations, no _jinja_extensions (ADR 0001).
+
+_message_after_copy: |
+  Generated {{ project_id }} ({{ profile }} profile).
+  Next steps (docs/procedure-provisioning.md in the template):
+    1. git init -b main && git add -A && git commit -m "chore: initialize from ai-meta-repo-template"
+    2. python scripts/check_governance.py
+    3. With explicit owner approval only: gh repo create {{ project_id }} --{{ visibility }} --source . --push
+    4. Add the repository to every assistant GitHub integration in use.
+    5. Add the protect-main ruleset and the required status check "governance".
+    6. Create the assistant project instructions from standard-project-instructions.md.
+  {%- if project_id.endswith('-private') %}
+    7. Complete the -private required actions before committing project content.
+  {%- endif %}
+
+_message_before_update: |
+  Updating from {{ _copier_answers._commit }}. Work on a dedicated branch with a clean tree.
+  Review the full diff and run python scripts/check_governance.py before committing.
+
+# ---------------------------------------------------------------------------
+# Computed values (never asked, never stored in the answers file)
+# ---------------------------------------------------------------------------
+
+template_repo:
+  type: str
+  default: cfiedler3/ai-meta-repo-template
+  when: false
+
+# Authoritative domain list: docs/standard-naming-project.md, Section 5.
+# tests/test_template.py fails if the two diverge.
+domains:
+  type: yaml
+  default: [am, biz, home, meta, personal, trip]
+  when: false
+
+commit_types:
+  type: yaml
+  default: [feat, fix, docs, chore, refactor, test, ci]
+  when: false
+
+# ---------------------------------------------------------------------------
+# Questions
+# ---------------------------------------------------------------------------
+
+project_id:
+  type: str
+  help: "Project ID, e.g. ai-biz-example-shop (see docs/standard-naming-project.md)"
+  validator: >-
+    {%- set segs = project_id.split('-') -%}
+    {%- if not (project_id | regex_search('^[a-z0-9]+(-[a-z0-9]+)+$')) -%}
+    Use lowercase letters, digits, and single hyphens only.
+    {%- elif segs[0] != 'ai' -%}
+    A repository Project ID starts with the backing prefix ai-.
+    {%- elif segs[1] in ['ai', 'hm'] -%}
+    Use exactly one backing prefix.
+    {%- elif 'private' in segs[:-1] -%}
+    The -private visibility suffix must be the final segment.
+    {%- elif segs | map('regex_search', '^v[0-9]+$') | select | list -%}
+    Do not put version numbers in a Project ID.
+    {%- elif (segs[1:-1] if segs[-1] == 'private' else segs[1:]) | length < 1 -%}
+    Add a project segment after the prefix.
+    {%- elif segs[1] in domains and (segs[2:-1] if segs[-1] == 'private' else segs[2:]) | length < 1 -%}
+    Add a project segment after the domain.
+    {%- endif -%}
+
+purpose:
+  type: str
+  help: "One sentence: what this repository is and who it is for"
+  validator: "{% if not purpose.strip() %}Required.{% endif %}"
+
+scope:
+  type: str
+  help: "One sentence: what is in scope and what done looks like"
+  validator: "{% if not scope.strip() %}Required.{% endif %}"
+
+profile:
+  type: str
+  help: "Development profile: how this project is developed and governed"
+  choices:
+    "assisted - owner directs, assistant helps; approval per action": assisted
+    "agentic - delegated, bounded autonomy with approval gates": agentic
+    "multi-agent - agentic plus orchestration and independent review": multi-agent
+  default: assisted
+
+visibility:
+  type: str
+  help: "Repository visibility (private unless public was explicitly approved)"
+  choices: [private, public]
+  default: "{{ 'public' if project_id.startswith('ai-meta-') else 'private' }}"
+  validator: >-
+    {%- if project_id.endswith('-private') and visibility != 'private' -%}
+    A -private Project ID requires private visibility.
+    {%- endif -%}
+
+owner:
+  type: str
+  help: "GitHub account or organization that will own the repository"
+  validator: >-
+    {%- if not (owner | regex_search('^[A-Za-z0-9](-?[A-Za-z0-9])*$')) -%}
+    Enter a GitHub account or organization name.
+    {%- endif -%}
+
+copyright_holder:
+  type: str
+  help: "Copyright holder for the MIT license"
+  default: "{{ owner }}"
+
+copyright_year:
+  type: int
+  help: "Copyright year for the MIT license"
+  default: "{{ '%Y' | strftime }}"
+
+efficiency_routing:
+  type: bool
+  help: "Enable the optional efficiency-routing module (needs a sibling ai-code-efficiency clone)"
+  default: false
+
+extra_types:
+  type: str
+  help: "Additional project-specific branch/commit types, comma-separated (blank for none)"
+  default: ""
+  validator: >-
+    {%- if extra_types and not (extra_types | regex_search('^[a-z]+(,[a-z]+)*$')) -%}
+    Comma-separated lowercase words, no spaces.
+    {%- endif -%}
+
+sensitive_data:
+  type: str
+  help: "What counts as sensitive in this -private project"
+  default: ""
+  when: "{{ project_id.endswith('-private') }}"
+  validator: "{% if project_id.endswith('-private') and not sensitive_data.strip() %}Required for -private projects.{% endif %}"
+
+tracked_content:
+  type: str
+  help: "What may be committed in this -private project (structure, procedures, no values)"
+  default: ""
+  when: "{{ project_id.endswith('-private') }}"
+  validator: "{% if project_id.endswith('-private') and not tracked_content.strip() %}Required for -private projects.{% endif %}"

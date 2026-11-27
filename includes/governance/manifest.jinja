@@ -1,0 +1,57 @@
+{#-
+  Governance manifest: the single definition of which modules each profile renders.
+
+  Inheritance is expressed here and nowhere else:
+    common       -> every profile
+    assisted     -> common + assisted autonomy
+    agentic      -> common + agentic autonomy + agentic extensions
+    multi-agent  -> agentic (unchanged) + multi-agent extensions
+
+  Each module is a file includes/governance/<path>.md.jinja.
+  Its section id is the layer code plus the module name, e.g. agentic/state -> agt-state.
+  Layer codes: cmn (common), ast (assisted), agt (agentic), mag (multi-agent).
+  tests/test_template.py and the rendered validator rely on these codes.
+-#}
+{%- set layer_codes = {'common': 'cmn', 'assisted': 'ast', 'agentic': 'agt', 'multi-agent': 'mag'} -%}
+
+{#- Rendered before the autonomy slot -#}
+{%- set common_head = ['common/header', 'common/authority'] -%}
+
+{#- Exactly one autonomy module per profile; multi-agent reuses agentic's -#}
+{%- set autonomy = {
+  'assisted': 'assisted/autonomy',
+  'agentic': 'agentic/autonomy',
+  'multi-agent': 'agentic/autonomy',
+} -%}
+
+{#- Rendered after the autonomy slot -#}
+{%- set common_body = ['common/prohibited', 'common/source-control', 'common/practices'] -%}
+
+{#- Profile extensions; multi-agent = agentic + its own -#}
+{%- set agentic_ext = ['agentic/state', 'agentic/recovery', 'agentic/escalation', 'agentic/completion'] -%}
+{%- set extensions = {
+  'assisted': [],
+  'agentic': agentic_ext,
+  'multi-agent': agentic_ext + ['multi-agent/orchestration', 'multi-agent/delegation', 'multi-agent/verification', 'multi-agent/models-cost'],
+} -%}
+
+{#- Answer-dependent common modules, independent of profile -#}
+{%- set conditional = [
+  ['common/data-handling', 'private'],
+  ['common/modules', 'efficiency_routing'],
+] -%}
+
+{%- set common_tail = ['common/references'] -%}
+
+{%- macro section_id(path) -%}
+{{ layer_codes[path.split('/')[0]] }}-{{ path.split('/')[1] }}
+{%- endmacro -%}
+
+{%- macro modules_for(profile, private, efficiency_routing) -%}
+{%- set flags = {'private': private, 'efficiency_routing': efficiency_routing} -%}
+{%- set ns = namespace(items=common_head + [autonomy[profile]] + common_body + extensions[profile]) -%}
+{%- for path, flag in conditional -%}
+{%- if flags[flag] %}{% set ns.items = ns.items + [path] %}{% endif -%}
+{%- endfor -%}
+{{ (ns.items + common_tail) | join(',') }}
+{%- endmacro -%}

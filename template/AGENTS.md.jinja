@@ -1,0 +1,21 @@
+{%- from 'includes/governance/manifest.jinja' import modules_for, section_id -%}
+{%- set private = project_id.endswith('-private') -%}
+{%- set commit = _copier_answers.get('_commit', '') -%}
+{%- set ref = commit if (commit | regex_search('^v[0-9]+[.][0-9]+[.][0-9]+$')) else _copier_conf.vcs_ref_hash -%}
+{%- set std = 'https://github.com/' ~ template_repo ~ '/blob/' ~ ref ~ '/docs/' -%}
+{%- set types = commit_types + (extra_types.split(',') if extra_types else []) -%}
+{%- for path in modules_for(profile, private, efficiency_routing).split(',') -%}
+{%- set sid = section_id(path) -%}
+{%- if not loop.first %}
+{% endif -%}
+{% include 'includes/governance/' ~ path ~ '.md.jinja' %}
+{%- endfor %}
+## Project <!-- project-owned: template updates never change this section -->
+
+{{ purpose }}
+
+**Scope and done:** {{ scope }}
+
+### Conventions
+
+<!-- Record language, formatting, test, and build conventions specific to this project here. -->

@@ -1,0 +1,23 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Local environment and secrets
+.env
+.env.*
+*.local
+
+# Agent scratch
+.claude/settings.local.json
+{%- if project_id.endswith('-private') %}
+
+# Sensitive records (-private project)
+data/
+{%- endif %}

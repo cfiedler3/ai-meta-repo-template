@@ -1,0 +1,36 @@
+# Multi-agent operations
+
+Template-owned procedures for the multi-agent profile. Rules are in `AGENTS.md`; agentic procedures in `agentic-operations.md` also apply.
+
+## 1. When to use multiple agents
+
+Use them only when the work splits into tasks that can run in parallel without editing the same files: for example, independent modules, research across separate sources, or review of finished work. Use a single agent for sequential or tightly coupled work; coordination overhead can exceed the work itself.
+
+## 2. Roles
+
+| Role | Owns | Never |
+|---|---|---|
+| Orchestrator | Plan, delegation log, integration, approval gates, owner communication | Approves its own integration without independent verification |
+| Specialist | One bounded task and its output | Edits files outside its task, contacts the owner, delegates further |
+| Verifier | Checking a change against its acceptance check | Verifies its own work |
+
+## 3. Task brief
+
+Every delegated task states:
+
+- id and role
+- model, named explicitly
+- objective and inputs
+- files it may change
+- expected output
+- acceptance check: a command or concrete criterion
+
+## 4. Delegation log
+
+Keep the log in `docs/agent/state.md` (table format in `agentic-operations.md`). Add the entry before the task starts; update status (`running`, `done`, `failed`, `abandoned`), verifier, and result when it ends.
+
+## 5. Model selection and cost
+
+- Choose the least costly model that reliably handles the task; use a more capable model for planning, integration, and verification of high-risk changes.
+- Do not let workers inherit the orchestrator's model by default.
+- Record token or cost figures per task when the tool reports them, and compare the total with the delegation's budget before starting more tasks.

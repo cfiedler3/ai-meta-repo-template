@@ -1,0 +1,10 @@
+## Working practices <!-- template-owned id={{ sid }} -->
+
+- State assumptions and trade-offs. Ask one question instead of guessing, unless a wrong guess is cheap to undo.
+- Define success criteria before starting, and verify them before reporting done.
+- Make the smallest change that solves the problem. Touch only what the task requires; clean up only what you created.
+- Prefer editing an existing file to creating a parallel one.
+- Add a tool, framework, dependency, or process only when its long-term value clearly exceeds its maintenance cost, and justify it in the pull request.
+- Update affected documentation in the same pull request.
+- Run `python scripts/check_governance.py` before each commit and fix what it reports.
+- Load only text into model context. Use deterministic extractors for binary or media files (images, video, audio, archives, executables), and extract the relevant section of large text files first.

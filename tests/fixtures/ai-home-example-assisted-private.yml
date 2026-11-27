@@ -1,0 +1,13 @@
+# Non-interactive answers for a -private project
+project_id: ai-home-example-assisted-private
+purpose: Example household records project used to test the assisted profile.
+scope: Procedures are tracked; values stay in data/.
+profile: assisted
+visibility: private
+owner: example-owner
+copyright_holder: Example Owner
+copyright_year: 2026
+efficiency_routing: false
+extra_types: perf
+sensitive_data: Account statements and balances.
+tracked_content: Procedures and folder structure without values.

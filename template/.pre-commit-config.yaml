@@ -1,0 +1,10 @@
+# Template-owned. Optional: `pre-commit install` runs the same check CI runs.
+repos:
+  - repo: local
+    hooks:
+      - id: governance
+        name: governance check
+        entry: python scripts/check_governance.py
+        language: system
+        pass_filenames: false
+        always_run: true

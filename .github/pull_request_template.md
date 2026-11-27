@@ -20,6 +20,8 @@
 - [ ] This change was reviewed before promotion. It is not a draft or placeholder.
 - [ ] This pull request was explicitly requested by the repository owner, not initiated autonomously by an AI system.
 - [ ] Documentation affected by this change is updated in this pull request.
+- [ ] `python -m unittest discover -s tests -v` passes; any snapshot changes are intended and reviewed.
+- [ ] Release impact stated: major, minor, or patch.
 
 ## Review Checklist
 

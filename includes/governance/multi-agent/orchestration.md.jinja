@@ -1,0 +1,6 @@
+## Orchestration <!-- template-owned id={{ sid }} -->
+
+- Use multiple agents only for work that splits into independent, parallel tasks; otherwise work as a single agent. Multi-agent runs cost several times the tokens of a single agent.
+- One orchestrator owns the plan, the delegation, integration, and every approval gate. Specialists report only to the orchestrator and stay within their task.
+- Give each specialist a bounded task: objective, inputs, files it may change, expected output, and acceptance check.
+- Allow one writer per file at a time; the orchestrator resolves overlaps.

@@ -1,0 +1,40 @@
+# Template-owned. Add "governance" as a required status check in the protect-main ruleset.
+name: governance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check governance
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: python scripts/check_governance.py --branch "$HEAD_REF" --pr-title "$PR_TITLE"
+
+  template-drift:
+    # Compares template-owned content with a fresh render of the recorded template version.
+    # Skips (passes with a warning) when the template cannot be reached.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --quiet "copier==9.19.1"
+      - name: Check template drift
+        run: |
+          git config --global user.name "governance-check"
+          git config --global user.email "governance-check@users.noreply.github.com"
+          python scripts/check_governance.py --drift

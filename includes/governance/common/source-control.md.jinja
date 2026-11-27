@@ -1,0 +1,6 @@
+## Source control <!-- template-owned id={{ sid }} -->
+
+1. Make every change on a branch named `<type>/<short-description>` and merge it through a pull request. The `protect-main` ruleset enforces this where the plan supports it; the rule applies regardless.
+2. Write commit messages and pull request titles as Conventional Commits: `type(scope): summary`. Types: {{ types | map('regex_replace', '^(.*)$', '`\\1`') | join(', ') }}. Squash merge makes the pull request title the commit on `main`.
+3. Keep one logical change per pull request; commit multi-file changes together, not file by file.
+4. Fill every section of `.github/pull_request_template.md` in the pull request body, including when opening it through an API, which does not apply the template. Use real line breaks, not `\n` sequences.

@@ -1,0 +1,10 @@
+# Non-interactive answers for: copier copy --defaults --data-file <this file> --vcs-ref <tag> <template> <dest>
+project_id: ai-biz-example-agentic
+purpose: Example storefront used to test the agentic profile.
+scope: Generated governance validates and survives template updates.
+profile: agentic
+visibility: public
+owner: example-owner
+copyright_holder: Example Owner
+copyright_year: 2026
+efficiency_routing: false

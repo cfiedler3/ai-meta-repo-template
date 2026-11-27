@@ -75,7 +75,8 @@ def tree_digest(root):
 class TemplateTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmp = Path(tempfile.mkdtemp(prefix="tpl-test-"))
+        # resolve(): Windows runners expose TEMP as an 8.3 short path, which copier update rejects.
+        cls.tmp = Path(tempfile.mkdtemp(prefix="tpl-test-")).resolve()
         cls.template = cls.tmp / "template-src"
         cls.template.mkdir()
         files = git(ROOT, "ls-files", "-co", "--exclude-standard", "-z").stdout.split("\0")
@@ -97,7 +98,7 @@ class TemplateTestCase(unittest.TestCase):
 
     def copy(self, fixture, dest_parent=None, extra=(), ref=TAG):
         project_id = fixture
-        dest = Path(dest_parent or tempfile.mkdtemp(dir=self.tmp)) / project_id
+        dest = Path(dest_parent or tempfile.mkdtemp(dir=str(self.tmp))).resolve() / project_id
         run(COPIER + ["copy", "--defaults", "--quiet", "--vcs-ref", ref,
                       "--data-file", str(FIXTURES / (fixture + ".yml")), *extra,
                       str(self.template), str(dest)])

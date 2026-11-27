@@ -32,7 +32,7 @@ Exit status 2 means a newer release exists (`--output-format json` for scripts).
 
 ## 4. Update to a new release
 
-1. Start from a clean working tree: `git status` shows nothing.
+1. Start from a clean working tree: `git status` shows nothing. On Windows, run Copier from the repository's full path, not an 8.3 short path such as `C:\Users\RUNNER~1\...`; Copier 9.19 rejects the mismatch.
 2. Create a branch: `git switch -c chore/template-update-vX.Y.Z`.
 3. Preview: `copier update --defaults --pretend --vcs-ref vX.Y.Z`.
 4. Apply: `copier update --defaults --conflict inline --vcs-ref vX.Y.Z`. Copier re-renders the old version with your recorded answers, applies the new version, and re-applies your changes.

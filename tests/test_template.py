@@ -232,7 +232,8 @@ class TestValidator(TemplateTestCase):
         checker = self.load_validator(dest)
         cases = ["ai-biz-example-shop", "ai-example", "ai-am-printer-profiles-private",
                  "ai-home-example-api-private", "biz-example", "ai-hm-example", "ai-private-example",
-                 "ai-example-private-api", "ai-biz-shop-v2", "ai-biz", "AI-Example", "ai--x", "ai-biz-private"]
+                 "ai-example-private-api", "ai-biz-shop-v2", "ai-biz", "AI-Example", "ai--x", "ai-biz-private",
+                 "ai-home-maint-porch", "ai-home-maint-porch-private"]
         for project_id in cases:
             with self.subTest(project_id=project_id):
                 py_ok = checker.project_id_error(project_id) is None

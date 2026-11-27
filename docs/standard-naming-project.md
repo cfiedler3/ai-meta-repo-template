@@ -29,7 +29,7 @@ Renaming a project means renaming all three. Adding or removing a repository cha
 ## 3. Project ID Format
 
 ```
-[backing]-[domain]-[project]-[descriptor]-[visibility]
+[backing]-[domain]-[project]-[child]-[descriptor]-[visibility]
 ```
 
 | Segment | Required | Meaning |
@@ -37,6 +37,7 @@ Renaming a project means renaming all three. Adding or removing a repository cha
 | `backing` | Yes | Where the source of truth lives (Section 4) |
 | `domain` | Recommended | Area of life or work (Section 5) |
 | `project` | Yes | The initiative name (Section 6) |
+| `child` | No | Sub-project of an existing parent project (Section 7) |
 | `descriptor` | No | Component or scope qualifier (Section 7) |
 | `visibility` | No | `private` only: the project is intended to remain private. Always the final segment. Platform rules define what it means for a repository (see `standard-naming-github.md`, Section 4) |
 
@@ -126,7 +127,17 @@ Add a suffix when a project has separately managed components.
 
 Component projects carry the same backing and domain prefixes as their parent. A visibility suffix, if used, follows the descriptor (`ai-example-api-private`).
 
-Sub-project nesting rules (for example, `home-maint` and `home-maint-porch`) are deferred.
+### Sub-projects
+
+A sub-project is a separate project with its own lifecycle, context, and assistant project, nested under a parent. Work that lacks these is a folder inside the parent, not a sub-project. See ADR 0006.
+
+1. A child's Project ID is the parent's Project ID (without its visibility suffix) plus exactly one `child` segment: `ai-home-maint` → `ai-home-maint-porch`.
+2. Descriptors are the closed list in the table above. Any other segment after a parent's ID is a child. Order: `[project]-[child]-[descriptor]-[visibility]`.
+3. A child carries the parent's backing prefix and domain. Promoting or demoting one promotes or demotes both.
+4. One level of nesting only. Local folders stay flat (Section 2); a child is never stored inside its parent's folder.
+5. The parent exists before any child is created.
+6. Renaming a parent renames every child, on all three artifacts.
+7. A child may add `-private` independently of its parent.
 
 ---
 
@@ -166,6 +177,7 @@ Archived projects and backup archives (`.zip`) are exempt from this standard.
 - [ ] Lowercase, hyphen-separated, no version numbers
 - [ ] Visibility suffix, if used, is `-private`, is last, and appears on every artifact
 - [ ] Assistant project, repository, and local folder all carry the ID exactly
+- [ ] Sub-project: parent exists, same backing prefix and domain, one level deep (Section 7)
 - [ ] Platform-specific checks completed (see the platform standard)
 
 ---
@@ -178,6 +190,9 @@ Archived projects and backup archives (`.zip`) are exempt from this standard.
 - Repository `ai-example-private` with assistant project `ai-example` (visibility suffix dropped from one artifact)
 - `ai-private-example` or `ai-example-private-api` (visibility suffix not last)
 - `ai-example` folder with no repository (wrong backing prefix)
+- `ai-home-maint-porch-front` (two levels of nesting)
+- `hm-home-maint` with child `ai-home-maint-porch` (child backing differs from parent)
+- A child folder inside its parent's folder
 - A copy of this document in another repository
 
 ---
@@ -186,6 +201,7 @@ Archived projects and backup archives (`.zip`) are exempt from this standard.
 
 | Date | Change |
 |---|---|
+| 2026-11-27 | Section 3: optional `child` segment. Section 7: sub-project nesting rules replace the deferral (ADR 0006). Sections 10, 11: checks and anti-patterns |
 | 2026-11-27 | Section 4: version control and backup are separate needs. Section 8: preserve local-only content before deleting a clone |
 | 2026-11-27 | Section 9: pinned links; template-rendered files are not copies (ADR 0003) |
 | 2026-11-14 | Section 3: a visibility suffix carries required actions, defined in the platform standard |

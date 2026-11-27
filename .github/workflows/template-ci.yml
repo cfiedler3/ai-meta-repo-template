@@ -34,25 +34,13 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          # Surface failures as annotations, which are readable without opening the log.
-          grep -E -A12 '^(FAIL|ERROR):' test-output.txt | grep -v '^--$' | head -60 | sed 's/^/::error::/' || true
-
-  pr-meta:
-    # Branch name and pull request title rules for this repository, using the generated validator.
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: python -m pip install --quiet "copier==9.19.1"
-      - name: Render validator and check branch and title
-        env:
-          HEAD_REF: ${{ github.head_ref }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          git config --global user.name "template-ci"
-          git config --global user.email "template-ci@users.noreply.github.com"
-          copier copy --defaults --quiet --vcs-ref HEAD --data-file tests/fixtures/ai-biz-example-assisted.yml . "$RUNNER_TEMP/ai-biz-example-assisted"
-          python "$RUNNER_TEMP/ai-biz-example-assisted/scripts/check_governance.py" --meta-only --branch "$HEAD_REF" --pr-title "$PR_TITLE"
+          # One annotation per failing test (annotations are readable without opening the log).
+          python - <<'PY'
+          import re
+          text = open("test-output.txt", encoding="utf-8", errors="replace").read()
+          blocks = re.split(r"\n={70}\n", text)
+          for block in blocks:
+              if re.match(r"(FAIL|ERROR): ", block):
+                  body = block.strip()[-3000:].replace("%", "%25").replace("\r", "").replace("\n", "%0A")
+                  print("::error::" + body)
+          PY

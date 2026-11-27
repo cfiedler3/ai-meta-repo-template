@@ -1,7 +1,7 @@
 # 0006. Sub-project nesting
 
 - Date: 2026-11-27
-- Status: proposed
+- Status: accepted (owner approved 2026-11-27, including rule 8)
 
 ## Context
 

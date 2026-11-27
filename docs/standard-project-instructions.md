@@ -10,7 +10,7 @@ Defines what an assistant's project settings (the per-project instruction field 
 
 1. **Identity** — one paragraph: Project ID, what it is, backing repository (`<owner>/<project-id>`), local clone location, primary development tool.
 2. **Start of every session** — attach and clone the repository; read `AGENTS.md`; attach and clone every repository listed as `enabled` in its Optional Modules table as a sibling at `../<module-repo>`; read any project documents `AGENTS.md` names; check history and open work before proposing changes.
-3. **Rules that hold before the repository is read** — the autonomy limits from `AGENTS.md` §4 that must bind even on a cold session: per-action approval for repository changes, no direct commits to `main`, no unrequested tooling.
+3. **Rules that hold before the repository is read** — the autonomy rules of the repository's profile that must bind even on a cold session: for `assisted`, per-action approval for repository changes; for `agentic` and `multi-agent`, work only within a delegation recorded in `docs/agent/state.md` and stop at approval gates. Always: no direct commits to `main`, no merging, no unrequested tooling.
 4. **Environment reality** — what the session's runtime can and cannot do (for example, no access to a desktop-only tool), and how work needing the unavailable tool is handed back.
 5. **Working style** — the project's brief communication preferences.
 
@@ -19,7 +19,7 @@ Defines what an assistant's project settings (the per-project instruction field 
 - Keep it short. If a section grows past a screen, the content belongs in the repository.
 - The Project ID appears verbatim and matches the repository name and local folder (see `standard-naming-project.md`).
 - Every repository the session must attach — the project repository and each enabled module — must be granted to every assistant integration the owner uses (chat connector and coding-agent app are separate installations with separate repository access lists). Grant access at repository creation.
-- When `AGENTS.md` changes in a way that affects bootstrap (new module, renamed document), update project settings in the same change.
+- When `AGENTS.md` changes in a way that affects bootstrap (new module, renamed document, profile change), update project settings in the same change.
 
 ## 4. Template
 
@@ -35,7 +35,8 @@ Defines what an assistant's project settings (the per-project instruction field 
 4. Check history and open work before proposing changes.
 
 ## Rules that apply before the repository is read
-- Every repository-modifying action needs explicit approval in this session, per action.
+- assisted: every repository-modifying action needs explicit approval in this session, per action.
+- agentic / multi-agent (use instead of the line above): work only within the delegation recorded in docs/agent/state.md; ask before the first push of a branch, before opening a pull request, and before anything outside the delegation.
 - Never commit to main. Branch + pull request, Conventional Commits, PR body reproduces the template.
 - Do not add tools, dependencies, or documents the repository does not call for.
 
@@ -45,3 +46,9 @@ Defines what an assistant's project settings (the per-project instruction field 
 ## Working style
 - <Three to five lines.>
 ```
+
+## 5. Change Log
+
+| Date | Change |
+|---|---|
+| 2026-11-27 | Cold-session rules depend on the development profile (`standard-governance-profiles.md`) |

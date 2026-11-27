@@ -145,6 +145,8 @@ Archived projects and backup archives (`.zip`) are exempt from this standard.
 
 - Project and platform standards live in `ai-meta-repo-template/docs/` only.
 - Other projects link to them; they never copy them. The template is public, so public repositories may link to it as well.
+- Generated repositories link to the standards pinned to the template release they were generated from; `copier update` moves the pin.
+- Files rendered by the template and tracked by the repository's `.copier-answers.yml` (for example `AGENTS.md` and its governance procedures) are not copies. They are template-owned and change only through the template (ADR 0003).
 - Project-specific conventions live in that project's README or `AGENTS.md`.
 
 ---
@@ -177,6 +179,7 @@ Archived projects and backup archives (`.zip`) are exempt from this standard.
 
 | Date | Change |
 |---|---|
+| 2026-11-27 | Section 9: pinned links; template-rendered files are not copies (ADR 0003) |
 | 2026-11-14 | Section 3: a visibility suffix carries required actions, defined in the platform standard |
 | 2026-11-07 | Added optional `visibility` segment (`-private`) to the Project ID format; it is part of the ID on every artifact. Updated checklist and anti-patterns |
 | 2026-10-01 | Added `meta-` domain; template is `ai-meta-repo-template` (public) and no longer exempt |

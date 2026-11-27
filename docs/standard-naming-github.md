@@ -19,10 +19,10 @@ A repository's name is the Project ID, exactly as defined in the project standar
 
 ## 3. Repository Creation
 
-- Create from `ai-meta-repo-template` so the repository carries `AGENTS.md`, the assistant instruction file that imports it, and the standard license.
+- Create from `ai-meta-repo-template` with Copier (`procedure-provisioning.md`) so the repository carries `AGENTS.md` for its development profile, the assistant instruction file that imports it, the governance check, and the standard license.
 - Create with private visibility unless public visibility has been explicitly approved. `meta-` repositories are public by default, since public repositories must be able to link to them.
 - Add the repository to the assistant's GitHub connector at creation.
-- Add a `protect-main` branch ruleset: require a pull request, block force pushes, squash merge only.
+- Add a `protect-main` branch ruleset: require a pull request, block force pushes, squash merge only, and require the `governance` status check. On GitHub Free, rulesets are enforced on public repositories only; on a private repository the check runs but does not block merging.
 - Clone to `<projects-root>/<Project ID>/`.
 
 ---
@@ -46,9 +46,9 @@ When a Project ID ends in `-private`, complete every action below. Actions 1 to 
 
 1. Carry the suffix on the assistant project, the repository, and the local folder (project standard, Section 3).
 2. Create the repository with private visibility, then confirm the setting in the repository's settings.
-3. Set the Visibility line in `AGENTS.md` Section 1 to `private`.
-4. Keep sensitive records in an untracked `data/` folder, and add `data/` to the repository's `.gitignore`. The template's `.gitignore` does not include it; it is added per private repository.
-5. Complete `AGENTS.md` Section 12 (Data Handling): state what is sensitive, where it lives, and what may be tracked.
+3. Answer `visibility: private` when provisioning; `AGENTS.md` then shows private visibility.
+4. Keep sensitive records in an untracked `data/` folder. The template adds `data/` to `.gitignore` for every `-private` Project ID, and the governance check fails if it is removed.
+5. Answer the `sensitive_data` and `tracked_content` questions: what is sensitive and what may be tracked. They render the Data Handling section of `AGENTS.md`.
 6. Never commit sensitive content, and never quote it in commit messages, pull request bodies, or issues. This binds people and agents alike.
 7. Do not copy or link private content into any public repository.
 8. Treat removal of the suffix as a rename of all three artifacts that also requires publication approval (see the rules below).
@@ -131,21 +131,21 @@ Multi-repo was chosen over monorepo because:
 Before creating a repo, confirm:
 
 - [ ] Name passes the project standard checklist
-- [ ] Created from `ai-meta-repo-template`
+- [ ] Created from `ai-meta-repo-template` with Copier, pinned to a release tag
 - [ ] Private by default; any public creation explicitly approved after content and history review
 - [ ] Added to the assistant's GitHub connector
 - [ ] `protect-main` ruleset applied
 - [ ] Cloned to `<projects-root>` under the same name
 - [ ] If used, `-private` is the final suffix
-- [ ] If `-private`: Section 4 required actions completed (visibility confirmed in settings, `data/` ignored, `AGENTS.md` Section 12 completed)
+- [ ] If `-private`: Section 4 required actions completed (visibility confirmed in settings, `data/` ignored, Data Handling section of `AGENTS.md` complete)
+- [ ] `python scripts/check_governance.py` reports 0 errors
 - [ ] Discovery inclusion and exclusion recorded separately when planning a review
 
 ---
 
-## 9. Future Extensions
+## 9. Branch and Commit Rules
 
-- Branch naming conventions
-- Commit message standards
+Defined in each repository's `AGENTS.md` (Source control section) and enforced by its governance check. Not repeated here.
 
 ---
 
@@ -153,6 +153,7 @@ Before creating a repo, confirm:
 
 | Date | Change |
 |---|---|
+| 2026-11-27 | Section 3: Copier provisioning, required `governance` check, GitHub Free ruleset limit. Section 4: required actions use Copier answers. Section 9: replaced stale future extensions with a pointer to `AGENTS.md` |
 | 2026-11-14 | Section 4: added numbered required actions for `-private` projects; generalized "lesson records" to "sensitive records"; added checklist item |
 | 2026-10-01 | Template is `ai-meta-repo-template`; `meta-` repositories public by default; `protect-main` ruleset required |
 | 2026-10-01 | Renamed from `github-naming-standard.md`. Trimmed to GitHub-specific content; identity, prefixes, and alignment moved to `standard-naming-project.md`. Added connector and retirement sections |

@@ -1,44 +1,43 @@
 # ai-meta-repo-template
 
-Starting point for every `ai-` repository: agent governance (`AGENTS.md`), license, and the project and GitHub naming standards.
+Provisions and updates `ai-` repositories with [Copier](https://copier.readthedocs.io/). Each generated repository gets cross-tool agent governance (`AGENTS.md`) for one of three development profiles, a governance check, CI, and the MIT license.
 
-## Use
+| Profile | Use when |
+|---|---|
+| `assisted` | The owner directs the work; the assistant needs approval for each change |
+| `agentic` | The owner delegates bounded work; the assistant stops at approval gates |
+| `multi-agent` | Agentic, plus parallel specialist agents with independent review |
 
-```
-gh repo create <project-id> --template cfiedler3/ai-meta-repo-template --private --clone
-```
+Profiles describe how a project is developed, not whether it uses AI. Details: [`docs/standard-governance-profiles.md`](docs/standard-governance-profiles.md).
 
-or click **Use this template** on GitHub. Name the repository with its Project ID (see `docs/standard-naming-project.md`).
-
-## After instantiating
-
-1. `AGENTS.md` — complete every section marked **[project]**. Leave the other sections unchanged.
-2. `README.md` — replace this file with the project's own.
-3. `docs/` — delete `standard-*.md`; link to them in this repository instead (see `docs/README.md`).
-4. `AGENTS.md` Section 8 — set each optional module to `enabled` or `disabled`.
-5. Add the repository to every assistant GitHub integration in use (chat connector and coding-agent app have separate access lists).
-6. Add a `protect-main` ruleset: require pull request, block force pushes, squash merge only.
-7. Create the assistant project's instructions from `docs/standard-project-instructions.md`.
-8. If the Project ID ends in `-private`, complete the required actions in `docs/standard-naming-github.md` Section 4 before committing any project content. Otherwise, delete `AGENTS.md` Section 12.
-
-## Contents
+## Create a repository
 
 ```
-.
-├── .github/
-│   └── pull_request_template.md
-├── .gitignore
-├── AGENTS.md           cross-tool agent governance
-├── CLAUDE.md           imports AGENTS.md
-├── LICENSE             MIT
-├── README.md
-└── docs/
-    ├── README.md
-    ├── standard-naming-project.md
-    ├── standard-naming-github.md
-    └── standard-project-instructions.md
+copier copy --vcs-ref vX.Y.Z gh:cfiedler3/ai-meta-repo-template <project-id>
 ```
+
+Unattended: add `--defaults --data-file answers.yml`. Full steps, including publication and hosted sessions: [`docs/procedure-provisioning.md`](docs/procedure-provisioning.md).
+
+## Update a repository or change its profile
+
+```
+copier update --defaults --vcs-ref vX.Y.Z
+copier update --defaults --vcs-ref=:current: --data profile=agentic
+```
+
+Review, validate, and roll back: [`docs/procedure-update-and-profile-change.md`](docs/procedure-update-and-profile-change.md). Repositories created before Copier: [`docs/procedure-downstream-migration.md`](docs/procedure-downstream-migration.md).
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `copier.yml` | Questions, validators, settings |
+| `includes/governance/` | Governance modules per layer and the manifest that defines profile inheritance |
+| `template/` | Everything rendered into a generated repository |
+| `docs/` | Standards, procedures, and decision records for this template |
+| `tests/` | Acceptance tests, answer fixtures, and reviewed output snapshots |
+| `AGENTS.md` | Governance for maintaining this repository (not rendered) |
 
 ## Changing the template
 
-Rules in `AGENTS.md` sections not marked **[project]**, and the standards in `docs/`, are changed here only. Repositories created earlier are not updated automatically; apply changes forward when touching each one.
+Follow `AGENTS.md`, Section 6. Run `python -m unittest discover -s tests -v` (needs Python 3.9+, Git, and Copier 9.19). The owner tags releases after merge; generated repositories pick changes up with `copier update`.
